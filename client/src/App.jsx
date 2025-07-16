@@ -1,35 +1,42 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+// App.jsx
+import React, { useState } from 'react';
+import Header from './layout/Header';
+import Home from './pages/Home';
+import './App.css';
+import { getProducts, getProductsByCategory } from './data/ProductData';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [filteredProducts, setFilteredProducts] = useState(getProducts());
+
+  const handleSearch = (term) => {
+    const results = getProducts().filter(product =>
+      product.name.toLowerCase().includes(term.toLowerCase()) ||
+      product.description.toLowerCase().includes(term.toLowerCase())
+    );
+    setFilteredProducts(results);
+  };
+
+  const handleCategorySelect = (category) => {
+    if (category === 'all') {
+      setFilteredProducts(getProducts());
+    } else {
+      setFilteredProducts(getProductsByCategory(category));
+    }
+  };
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <Header
+        cartCount={3}
+        onSearch={handleSearch}
+        onCategorySelect={handleCategorySelect}
+      />
+      <Home
+        products={filteredProducts}
+        onProductClick={(product) => console.log('Product clicked:', product)}
+      />
     </>
-  )
+  );
 }
 
-export default App
+export default App;
