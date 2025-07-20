@@ -24,6 +24,11 @@ const Header = ({ cartCount = 0, onSearch, onCategorySelect, onCartClick }) => {
 
       {/* Category Buttons */}
       <div className="flex space-x-2 mb-2 md:mb-0">
+        <Link
+          to="/products"
+          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition">
+          All Products
+        </Link>
         {["All", "Men", "Women", "Kids"].map((cat) => (
           <button
             key={cat}
@@ -37,8 +42,8 @@ const Header = ({ cartCount = 0, onSearch, onCategorySelect, onCartClick }) => {
 
       {/* Cart Button */}
       <div className="relative">
-        <button
-          onClick={onCartClick}
+        <Link
+          to="/cart"
           className="relative p-2 hover:bg-gray-100 rounded-full transition-colors"
         >
           <svg
@@ -59,7 +64,7 @@ const Header = ({ cartCount = 0, onSearch, onCategorySelect, onCartClick }) => {
               {cartCount}
             </span>
           )}
-        </button>
+        </Link>
       </div>
     </header>
   );
