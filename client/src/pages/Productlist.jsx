@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 
-const ProductList = ({ products, onProductClick }) => {
+const ProductList = ({ products, onProductClick, onAddToCart }) => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedBrand, setSelectedBrand] = useState('all');
   const [priceRange, setPriceRange] = useState([0, 2000]);
@@ -37,6 +37,12 @@ const ProductList = ({ products, onProductClick }) => {
 
   const handleAddToCart = (e, product) => {
     e.stopPropagation();
+    if (onAddToCart) {
+      onAddToCart(product);
+      alert(`${product.name} added to cart!`);
+    }
+  };
+   const handleProductClick = (product) => {
     if (onProductClick) {
       onProductClick(product);
     }
@@ -202,10 +208,10 @@ const ProductList = ({ products, onProductClick }) => {
                 <div
                   key={product.id}
                   className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow cursor-pointer group"
-                  onClick={() => onProductClick && onProductClick(product)}
+                  
                 >
                   <div className="relative">
-                    <div className="aspect-square overflow-hidden">
+                    <div onClick={() => handleProductClick(product)}  className="aspect-square overflow-hidden">
                       <img
                         src={product.image}
                         alt={product.name}
@@ -278,3 +284,4 @@ const ProductList = ({ products, onProductClick }) => {
 };
 
 export default ProductList;
+
