@@ -1,17 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import Header from './layout/Header';
 import Home from './pages/Home';
 import Cart from './pages/Cart';
 import ProductList from './pages/Productlist';
 import Product from './pages/Product.jsx';
-import { getProducts, getProductsByCategory } from './data/ProductData';
+import { getProducts } from './services/api';
 
 function App() {
   const navigate = useNavigate();
-  const [products] = useState(getProducts());
-  const [filteredProducts, setFilteredProducts] = useState(products);
+  const [products, setProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
   const [cartItems, setCartItems] = useState([]);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      const response = await getProducts();
+      setProducts(response.data);
+      setFilteredProducts(response.data);
+    };
+    fetchProducts();
+  }, []);
 
   const handleSearch = (term) => {
     if (!term.trim()) {

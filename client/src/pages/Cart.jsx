@@ -1,10 +1,27 @@
 // src/components/pages/Cart.jsx
 
 import React from 'react';
+import { createOrder } from '../services/api';
 
 const Cart = ({ cartItems, onAdd, onRemove }) => {
   const getTotalPrice = () => {
     return cartItems.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2);
+  };
+
+  const handleCheckout = async () => {
+    const order = {
+      products: cartItems.map(item => ({
+        product: item._id,
+        quantity: item.quantity,
+      })),
+      total: getTotalPrice(),
+    };
+    try {
+      await createOrder(order);
+      alert('Order placed successfully!');
+    } catch (error) {
+      alert('Failed to place order.');
+    }
   };
 
   return (
@@ -51,7 +68,7 @@ const Cart = ({ cartItems, onAdd, onRemove }) => {
 
                 <div className="font-bold text-blue-600">
                   ${(item.price * item.quantity).toFixed(2)}
-                </div>
+</div>
               </div>
             ))}
           </div>
@@ -60,7 +77,10 @@ const Cart = ({ cartItems, onAdd, onRemove }) => {
             <h3 className="text-xl font-semibold">
               Total: ${getTotalPrice()}
             </h3>
-            <button className="mt-4 bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
+            <button
+              onClick={handleCheckout}
+              className="mt-4 bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+            >
               Checkout
             </button>
           </div>
