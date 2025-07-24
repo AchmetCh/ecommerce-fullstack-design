@@ -360,13 +360,21 @@
 
 
 // src/pages/Product.jsx
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { getProductById } from "./../data/ProductData";
+import { getProductById } from "../services/api";
 
 const Product = ({ onAddToCart }) => {  // Fixed: destructure onAddToCart properly
   const { id } = useParams();
-  const product = getProductById(id);
+  const [product, setProduct] = useState(null);
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      const response = await getProductById(id);
+      setProduct(response.data);
+    };
+    fetchProduct();
+  }, [id]);
 
   if (!product) {
     return <div className="text-center mt-10 text-red-600">Product not found.</div>;
