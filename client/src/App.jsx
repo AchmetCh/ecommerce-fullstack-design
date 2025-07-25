@@ -35,13 +35,6 @@ function App() {
     setFilteredProducts(results);
   };
 
-  const handleCategorySelect = (category) => {
-    if (category === 'all') {
-      setFilteredProducts(products);
-    } else {
-      setFilteredProducts(getProductsByCategory(category));
-    }
-  };
 
   const handleAddToCart = (product) => {
     const existingItem = cartItems.find((item) => item.id === product.id);
@@ -82,7 +75,6 @@ function App() {
       <Header
         cartCount={cartCount}
         onSearch={handleSearch}
-        onCategorySelect={handleCategorySelect}
       />
 
       <Routes>
