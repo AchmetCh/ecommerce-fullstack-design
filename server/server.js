@@ -10,7 +10,7 @@ const productRoutes = require('./routes/productRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 
 // Connect to MongoDB
-connectDB();
+// connectDB();
 // Middleware
 app.use(cors(
     {
