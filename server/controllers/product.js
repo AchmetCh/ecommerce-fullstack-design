@@ -2,6 +2,7 @@ const product = require('../models/product');
 
 // Controller to handle product-related requests
 
+
 // Add a new product
 exports.addProduct = async (req, res) => {
     const { name, price,image, description, category, stock } = req.body;
@@ -25,26 +26,7 @@ exports.addProduct = async (req, res) => {
 // Get all products
 exports.getAllProducts = async (req, res) => {
     try {
-        const products = [
-            {
-                "_id": "60d5ec49e7a5c8001f8e4d4e",
-                "name": "Laptop",
-                "price": 1200,
-                "image": "https://via.placeholder.com/150",
-                "description": "A high-performance laptop.",
-                "category": "Electronics",
-                "stock": 50
-            },
-            {
-                "_id": "60d5ec49e7a5c8001f8e4d4f",
-                "name": "Keyboard",
-                "price": 75,
-                "image": "https://via.placeholder.com/150",
-                "description": "A mechanical keyboard.",
-                "category": "Electronics",
-                "stock": 100
-            }
-        ];
+        const products = await product.find();
         res.status(200).json(products);
     } catch (error) {
         console.error('Error fetching products:', error);
@@ -65,5 +47,3 @@ exports.getProductById = async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 }
-
-

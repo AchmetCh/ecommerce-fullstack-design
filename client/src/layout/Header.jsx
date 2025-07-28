@@ -1,7 +1,9 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { useAuth } from "../ContextApi.jsx";
 
-const Header = ({ cartCount = 0, onSearch, onCategorySelect, onCartClick }) => {
+const Header = ( ) => {
+  const { cartCount, setCartCount } = useAuth();
   return (
     <header className="bg-white shadow-md p-4 flex flex-col md:flex-row items-center justify-between">
       {/* Logo */}

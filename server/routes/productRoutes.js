@@ -8,6 +8,6 @@ router.get('/', product.getAllProducts);
 // Get a product by ID
 router.get('/:id', product.getProductById);
 // Add a new product (protected route)
-router.post('/new', auth.authenticate, product.addProduct);
+router.post('/new', auth.authenticate, auth.isAdmin, product.addProduct);
 // Export the router
 module.exports = router

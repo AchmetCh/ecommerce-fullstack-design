@@ -8,7 +8,7 @@ const PRIVATE_KEY = process.env.PRIVATE_KEY;
 
 // Register a new user
 exports.register = async (req, res) => {
-    const { email, password } = req.body;
+    const { email, password, role } = req.body;
     try {
         // Check if user already exists
         const existingUser = await User.findOne({ email });
@@ -20,10 +20,12 @@ exports.register = async (req, res) => {
         // Create a new user
         const newUser = new User({
             email,
-            password: hashedPassword
+            password: hashedPassword,
+            role: role || 'user' // Default to 'user' if no role is provided
         });
         await newUser.save();
-        res.status(201).json({ message: 'User registered successfully' });
+        const token = jwt.sign({ id: newUser._id, role: newUser.role }, PRIVATE_KEY, { expiresIn: '1h' });
+        res.status(201).json({ token, message: 'User registered successfully' });
     } catch (error) {
         console.error('Error registering user:', error);
         res.status(500).json({ message: 'Internal server error' });
@@ -45,7 +47,7 @@ exports.login = async (req, res) => {
             return res.status(400).json({ message: 'Invalid email or password' });
         }
         // Generate JWT token
-        const token = jwt.sign({ id: user._id }, PRIVATE_KEY, { expiresIn: '1h' });
+        const token = jwt.sign({ id: user._id, role: user.role }, PRIVATE_KEY, { expiresIn: '1h' });
         res.status(200).json({ token });
     } catch (error) {
         console.error('Error logging in user:', error);

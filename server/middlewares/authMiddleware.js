@@ -19,3 +19,12 @@ exports.authenticate = async (req, res, next) => {
         res.status(401).json({ message: 'Invalid token' });
     }
 }
+
+// Middleware to authorize user roles
+exports.isAdmin = (req, res, next) => {
+    if (req.user && req.user.role === 'admin') {
+        next();
+    } else {
+        return res.status(403).json({ message: 'Access denied' });
+    }
+}
