@@ -1,9 +1,9 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { useAuth } from "../ContextApi.jsx";
+import { useAuth } from "../ContextApi";
 
 const Header = ( ) => {
-  const { cartCount, setCartCount } = useAuth();
+  const { cartItems } = useAuth();
   return (
     <header className="bg-white shadow-md p-4 flex flex-col md:flex-row items-center justify-between">
       {/* Logo */}
@@ -43,12 +43,10 @@ const Header = ( ) => {
       </div>
 
       {/* Cart Button */}
-      <div className="relative">
-        <Link
-          to="/cart"
-          className="relative p-2 hover:bg-gray-100 rounded-full transition-colors"
-        >
-          <svg
+      <Link
+        to="/cart"
+        className="relative px-4 py-2 text-white rounded hover:bg-green-600 transition">
+         <svg
             className="w-6 h-6 text-gray-600"
             fill="none"
             stroke="currentColor"
@@ -61,13 +59,12 @@ const Header = ( ) => {
               d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.5 6m0 0H17M9 19a2 2 0 100-4 2 2 0 000 4zm8 0a2 2 0 100-4 2 2 0 000 4z"
             />
           </svg>
-          {cartCount > 0 && (
-            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-              {cartCount}
-            </span>
-          )}
-        </Link>
-      </div>
+        {cartItems.length > 0 && (
+          <span className="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold rounded-full px-2">
+            {cartItems.length}
+          </span>
+        )}
+      </Link>
     </header>
   );
 };

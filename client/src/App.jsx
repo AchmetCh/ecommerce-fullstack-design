@@ -125,6 +125,7 @@
 import { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Header from "./layout/Header";
+import Home from "./pages/Home";
 
 function App() {
 
@@ -132,6 +133,7 @@ function App() {
   return (
     <div className="App"> 
       <Header />
+      <Home />
 
       {/* Define your routes here */}
       <Routes>
