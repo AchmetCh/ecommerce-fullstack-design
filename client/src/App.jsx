@@ -122,22 +122,27 @@
 
 // export default App;
 
+
 import { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Header from "./layout/Header";
-import Home from "./pages/Home";
+import Header from "./components/layout/Header";
+import Home from "./components/pages/Home";
+import ProductList from "./components/pages/Productlist";
+import Product from "./components/pages/Product";
+import Cart from "./components/pages/Cart";
 
 function App() {
-
 
   return (
     <div className="App"> 
       <Header />
-      <Home />
-
       {/* Define your routes here */}
       <Routes>
-        {/* Define your routes here */}
+        <Route path="/" element={<Home />} />
+        <Route path="/products" element={<ProductList />} />
+        <Route path="/product/:id" element={<Product />} />
+        <Route path="/cart" element={<Cart />} />
+        {/* Add more routes as needed */}
       </Routes>
     </div>
   );
