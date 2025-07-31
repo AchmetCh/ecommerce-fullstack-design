@@ -46,6 +46,9 @@ Users can browse products, add them to the cart, and place orders — all withou
 - pass: 12345
 ---
 
+## Live Url
+* https://ecom.myrender.eu/
+
 ## 🛠 Getting Started
 
 1. **Clone the repository**
