@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { backendApi } from '../services/Api';
 import { useAuth } from '../../ContextApi';
+import toast, { Toaster } from 'react-hot-toast';
 
 const ProductList = () => {
   const { cartItems, setCartItems, searchQuery, selectedCategory: contextCategory } = useAuth();
@@ -68,17 +69,36 @@ const ProductList = () => {
         return 0;
     }
   });
+// Use this handleAddToCart function in both Home.js and ProductList.js
 
-  const handleAddToCart = (e, product) => {
-    e.stopPropagation();
+const handleAddToCart = (e, product) => {
+  e.stopPropagation();
 
-    // Add product to cart
-    const updatedCart = [...cartItems, product];
-    setCartItems(updatedCart);
-    localStorage.setItem('cartItems', JSON.stringify(updatedCart));
+  // Check if product already exists in cart
+  const existingItemIndex = cartItems.findIndex(item => item._id === product._id);
+  
+  let updatedCart;
+  
+  if (existingItemIndex !== -1) {
+    // Item exists, increase quantity
+    updatedCart = cartItems.map((item, index) => 
+      index === existingItemIndex 
+        ? { ...item, quantity: (item.quantity || 1) + 1 }
+        : item
+    );
+  } else {
+    // New item, add to cart with quantity 1
+    updatedCart = [...cartItems, { ...product, quantity: 1 }];
+  }
+  
+  setCartItems(updatedCart);
+  localStorage.setItem('cartItems', JSON.stringify(updatedCart));
 
-    alert(`${product.name} added to cart!`);
-  };
+  toast.success(`${product.name} added to cart!`, {
+    position: 'top-right',
+    duration: 3000,
+  });
+};
 
 const handleProductClick = (product) => {
   window.location.href = `/product/${product._id}`;
@@ -331,6 +351,7 @@ const handleProductClick = (product) => {
           </div>
         </div>
       </div>
+      <Toaster />
     </div>
   );
 };

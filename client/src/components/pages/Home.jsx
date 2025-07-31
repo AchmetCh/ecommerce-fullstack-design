@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 import {backendApi} from '../services/Api';
 import { useAuth } from '../../ContextApi';
+import toast, { Toaster } from 'react-hot-toast';
 
 const Home = () => {
   const { cartItems, setCartItems } = useAuth();
@@ -22,16 +24,36 @@ const Home = () => {
     fetchProducts();
   }, []);
 
-  const handleAddToCart = (e, product) => {
-    e.stopPropagation();
+// Use this handleAddToCart function in both Home.js and ProductList.js
 
-    // Add product to cart
-    const updatedCart = [...cartItems, product];
-    setCartItems(updatedCart);
-    localStorage.setItem('cartItems', JSON.stringify(updatedCart));
+const handleAddToCart = (e, product) => {
+  e.stopPropagation();
 
-    alert(`${product.name} added to cart!`);
-  };
+  // Check if product already exists in cart
+  const existingItemIndex = cartItems.findIndex(item => item._id === product._id);
+  
+  let updatedCart;
+  
+  if (existingItemIndex !== -1) {
+    // Item exists, increase quantity
+    updatedCart = cartItems.map((item, index) => 
+      index === existingItemIndex 
+        ? { ...item, quantity: (item.quantity || 1) + 1 }
+        : item
+    );
+  } else {
+    // New item, add to cart with quantity 1
+    updatedCart = [...cartItems, { ...product, quantity: 1 }];
+  }
+  
+  setCartItems(updatedCart);
+  localStorage.setItem('cartItems', JSON.stringify(updatedCart));
+
+  toast.success(`${product.name} added to cart!`, {
+    position: 'top-right',
+    duration: 3000,
+  });
+};
   const handleProductClick = (product) => {
   window.location.href = `/product/${product._id}`;
   };
@@ -97,12 +119,15 @@ const Home = () => {
           </div>
 
           <div className="text-center mt-12">
-            <button className="bg-gray-900 text-white px-8 py-3 rounded-lg hover:bg-gray-800 transition-colors">
+            <Link to="/products" className="bg-gray-900 text-white px-8 py-3 rounded-lg hover:bg-gray-800 transition-colors">
+           
               View All Products
-            </button>
+           
+            </Link>
           </div>
         </div>
       </section>
+      <Toaster />
     </div>
   );
 };

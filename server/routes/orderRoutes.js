@@ -4,7 +4,7 @@ const order = require('../controllers/order');
 const auth = require('../middlewares/authMiddleware');
 
 // Get all orders (protected route)
-router.get('/', auth.authenticate, order.getAllOrders); 
+router.get('/', auth.authenticate, auth.isAdmin, order.getAllOrders); 
 // Get an order by ID (protected route)
 router.get('/:id', auth.authenticate, order.getOrderById);
 // Get orders by customer email (protected route)
