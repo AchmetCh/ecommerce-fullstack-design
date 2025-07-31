@@ -46,7 +46,7 @@ const Header = () => {
       <div className="bg-gray-800 text-white py-2">
         <div className="max-w-7xl mx-auto px-4 flex justify-between items-center">
           <div className="text-sm">
-            Welcome to MyShop - Free shipping on orders over $250!
+            Welcome to MyShop - Get Free Shipping on all orders!!
           </div>
           <div className="flex space-x-4 text-sm">
             {user ? (

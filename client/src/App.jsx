@@ -10,6 +10,7 @@ import Register from "./components/auth/Register";
 import { useAuth } from "./ContextApi";
 import AddProduct from "./components/pages/AddNewProduct";
 import Orders from "./components/pages/ViewAllOrders";
+import Footer from "./components/layout/Footer";
 
 function App() {
 
@@ -32,7 +33,10 @@ function App() {
             <Route path="/orders" element={<Orders />} />
           </>
         )}
+        <Route path="*" element={<h1 className="text-2xl text-center mt-10">Page Not Found</h1>} />
       </Routes>
+      <Footer />
+
     </div>
   );
 }

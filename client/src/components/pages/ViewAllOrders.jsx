@@ -9,10 +9,15 @@ const ViewAllOrders = () => {
   const { user } = useAuth();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [showViewModal, setShowViewModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingOrder, setEditingOrder] = useState(null);
+  const [newStatus, setNewStatus] = useState("");
 
   useEffect(() => {
     if (!user || user.role !== 'admin') {
-      window.location.href = '/login'; // Redirect to login if not admin
+      window.location.href = '/login';
     }
   }, [user]);
 
@@ -32,7 +37,7 @@ const ViewAllOrders = () => {
         setLoading(true);
         const response = await axios.get(`${backendApi}/orders`, {
           headers: {
-            'Authorization': token, 
+            'Authorization': token,
             'Content-Type': 'application/json'
           }
         });
@@ -40,7 +45,6 @@ const ViewAllOrders = () => {
       } catch (err) {
         console.error("Failed to fetch orders:", err);
         
-        // Handle specific error messages
         if (err.response?.status === 401) {
           toast.error('Unauthorized. Please login again.', {
             position: 'top-right',
@@ -68,6 +72,81 @@ const ViewAllOrders = () => {
       fetchOrders();
     }
   }, [user]);
+
+  const handleViewOrder = (order) => {
+    setSelectedOrder(order);
+    setShowViewModal(true);
+  };
+
+  const handleEditOrder = (order) => {
+    setEditingOrder(order);
+    setNewStatus(order.status);
+    setShowEditModal(true);
+  };
+
+  const handleUpdateStatus = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.put(`${backendApi}/orders/${editingOrder._id}/status`, 
+        { status: newStatus },
+        {
+          headers: {
+            'Authorization': token,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+      
+      // Update the order in the local state
+      setOrders(orders.map(order => 
+        order._id === editingOrder._id 
+          ? { ...order, status: newStatus }
+          : order
+      ));
+      
+      toast.success('Order status updated successfully!', {
+        position: 'top-right',
+        duration: 3000,
+      });
+      
+      setShowEditModal(false);
+      setEditingOrder(null);
+    } catch (error) {
+      console.error('Error updating order:', error);
+      toast.error(error.response?.data?.message || 'Failed to update order status', {
+        position: 'top-right',
+        duration: 3000,
+      });
+    }
+  };
+
+  const handleDeleteOrder = async (orderId) => {
+    if (window.confirm('Are you sure you want to delete this order? This action cannot be undone.')) {
+      try {
+        const token = localStorage.getItem('token');
+        await axios.delete(`${backendApi}/orders/${orderId}`, {
+          headers: {
+            'Authorization': token,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        // Remove the order from local state
+        setOrders(orders.filter(order => order._id !== orderId));
+        
+        toast.success('Order deleted successfully!', {
+          position: 'top-right',
+          duration: 3000,
+        });
+      } catch (error) {
+        console.error('Error deleting order:', error);
+        toast.error(error.response?.data?.message || 'Failed to delete order', {
+          position: 'top-right',
+          duration: 3000,
+        });
+      }
+    }
+  };
 
   if (loading) {
     return (
@@ -107,7 +186,7 @@ const ViewAllOrders = () => {
                 Products
               </Link>
               <Link 
-                to="/add-product" 
+                to="/admin/add-product" 
                 className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -163,22 +242,24 @@ const ViewAllOrders = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-900">{order.customer?.name || 'N/A'}</div>
-                        <div className="text-sm text-gray-500">{order.customer?.email || order.userEmail || 'N/A'}</div>
+                        <div className="text-sm text-gray-500">{order.customer?.email || 'N/A'}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {order.items?.length || order.products?.length || 0} items
+                        {order.items?.length || 0} items
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-green-600">
-                        ${(order.totalPrice || order.totalAmount || order.total || 0).toFixed(2)}
+                        ${(order.totalPrice || 0).toFixed(2)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${
-                          order.status === 'completed' || order.status === 'delivered' 
+                          order.status === 'delivered' 
                             ? 'bg-green-100 text-green-800'
                             : order.status === 'pending'
                             ? 'bg-yellow-100 text-yellow-800'
                             : order.status === 'processing'
                             ? 'bg-blue-100 text-blue-800'
+                            : order.status === 'shipped'
+                            ? 'bg-purple-100 text-purple-800'
                             : order.status === 'cancelled'
                             ? 'bg-red-100 text-red-800'
                             : 'bg-gray-100 text-gray-800'
@@ -190,11 +271,23 @@ const ViewAllOrders = () => {
                         {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : 'N/A'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                        <button className="text-blue-600 hover:text-blue-900 transition-colors">
+                        <button 
+                          onClick={() => handleViewOrder(order)}
+                          className="text-blue-600 hover:text-blue-900 transition-colors"
+                        >
                           View
                         </button>
-                        <button className="text-gray-600 hover:text-gray-900 transition-colors">
+                        <button 
+                          onClick={() => handleEditOrder(order)}
+                          className="text-green-600 hover:text-green-900 transition-colors"
+                        >
                           Edit
+                        </button>
+                        <button 
+                          onClick={() => handleDeleteOrder(order._id)}
+                          className="text-red-600 hover:text-red-900 transition-colors"
+                        >
+                          Delete
                         </button>
                       </td>
                     </tr>
@@ -207,7 +300,7 @@ const ViewAllOrders = () => {
 
         {/* Orders Summary */}
         {orders.length > 0 && (
-          <div className="mt-8 grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="mt-8 grid grid-cols-1 md:grid-cols-5 gap-6">
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
@@ -236,7 +329,7 @@ const ViewAllOrders = () => {
                 <div className="ml-4">
                   <div className="text-sm font-medium text-gray-500">Total Revenue</div>
                   <div className="text-2xl font-bold text-gray-900">
-                    ${orders.reduce((sum, order) => sum + (order.totalPrice || order.totalAmount || order.total || 0), 0).toFixed(2)}
+                    ${orders.reduce((sum, order) => sum + (order.totalPrice || 0), 0).toFixed(2)}
                   </div>
                 </div>
               </div>
@@ -263,6 +356,24 @@ const ViewAllOrders = () => {
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
+                  <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                    <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                    </svg>
+                  </div>
+                </div>
+                <div className="ml-4">
+                  <div className="text-sm font-medium text-gray-500">Shipped Orders</div>
+                  <div className="text-2xl font-bold text-gray-900">
+                    {orders.filter(order => order.status === 'shipped').length}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
                   <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
                     <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -270,10 +381,163 @@ const ViewAllOrders = () => {
                   </div>
                 </div>
                 <div className="ml-4">
-                  <div className="text-sm font-medium text-gray-500">Completed Orders</div>
+                  <div className="text-sm font-medium text-gray-500">Delivered Orders</div>
                   <div className="text-2xl font-bold text-gray-900">
-                    {orders.filter(order => order.status === 'completed' || order.status === 'delivered').length}
+                    {orders.filter(order => order.status === 'delivered').length}
                   </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* View Order Modal */}
+        {showViewModal && selectedOrder && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-8 max-w-2xl w-full mx-4 max-h-screen overflow-y-auto">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold text-gray-900">Order Details</h2>
+                <button
+                  onClick={() => setShowViewModal(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              <div className="space-y-6">
+                {/* Order Info */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-500">Order ID</label>
+                    <p className="text-lg font-mono">#{selectedOrder._id.slice(-8)}</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-500">Status</label>
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium capitalize ${
+                      selectedOrder.status === 'delivered' 
+                        ? 'bg-green-100 text-green-800'
+                        : selectedOrder.status === 'pending'
+                        ? 'bg-yellow-100 text-yellow-800'
+                        : selectedOrder.status === 'processing'
+                        ? 'bg-blue-100 text-blue-800'
+                        : selectedOrder.status === 'shipped'
+                        ? 'bg-purple-100 text-purple-800'
+                        : selectedOrder.status === 'cancelled'
+                        ? 'bg-red-100 text-red-800'
+                        : 'bg-gray-100 text-gray-800'
+                    }`}>
+                      {selectedOrder.status}
+                    </span>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-500">Customer Name</label>
+                    <p className="text-lg">{selectedOrder.customer?.name}</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-500">Customer Email</label>
+                    <p className="text-lg">{selectedOrder.customer?.email}</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-500">Order Date</label>
+                    <p className="text-lg">{new Date(selectedOrder.createdAt).toLocaleDateString()}</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-500">Total Price</label>
+                    <p className="text-lg font-semibold text-green-600">${selectedOrder.totalPrice.toFixed(2)}</p>
+                  </div>
+                </div>
+
+                {/* Order Items */}
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Order Items</h3>
+                  <div className="border rounded-lg overflow-hidden">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Product</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Price</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Quantity</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Subtotal</th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {selectedOrder.items?.map((item, index) => (
+                          <tr key={index}>
+                            <td className="px-4 py-4 text-sm text-gray-900">{item.name}</td>
+                            <td className="px-4 py-4 text-sm text-gray-900">${item.price.toFixed(2)}</td>
+                            <td className="px-4 py-4 text-sm text-gray-900">{item.quantity}</td>
+                            <td className="px-4 py-4 text-sm font-semibold text-gray-900">
+                              ${(item.price * item.quantity).toFixed(2)}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Edit Status Modal */}
+        {showEditModal && editingOrder && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold text-gray-900">Update Order Status</h2>
+                <button
+                  onClick={() => setShowEditModal(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-500 mb-2">Order ID</label>
+                  <p className="text-lg font-mono">#{editingOrder._id.slice(-8)}</p>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-500 mb-2">Current Status</label>
+                  <p className="text-lg capitalize">{editingOrder.status}</p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">New Status</label>
+                  <select
+                    value={newStatus}
+                    onChange={(e) => setNewStatus(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="pending">Pending</option>
+                    <option value="processing">Processing</option>
+                    <option value="shipped">Shipped</option>
+                    <option value="delivered">Delivered</option>
+                    <option value="cancelled">Cancelled</option>
+                  </select>
+                </div>
+
+                <div className="flex space-x-4 pt-4">
+                  <button
+                    onClick={() => setShowEditModal(false)}
+                    className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleUpdateStatus}
+                    className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                  >
+                    Update Status
+                  </button>
                 </div>
               </div>
             </div>

@@ -74,3 +74,34 @@ exports.getOrderByEmail = async (req, res) => {
         res.status(500).json({ message: "Internal server error" });
     }
 }
+
+// Delete order by ID
+exports.deleteOrderById = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const orderItem = await order.findByIdAndDelete(id);
+        if (!orderItem) {
+            return res.status(404).json({ message: "Order not found" });
+        }
+        res.status(200).json({ message: "Order deleted successfully" });
+    } catch (error) {
+        console.error("Error deleting order:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+}
+
+// Change order status
+exports.changeOrderStatus = async (req, res) => {
+    const { id } = req.params;
+    const { status } = req.body;
+    try {
+        const orderItem = await order.findByIdAndUpdate(id, { status }, { new: true });
+        if (!orderItem) {
+            return res.status(404).json({ message: "Order not found" });
+        }
+        res.status(200).json({ message: "Order status changed successfully", order: orderItem });
+    } catch (error) {
+        console.error("Error changing order status:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+}

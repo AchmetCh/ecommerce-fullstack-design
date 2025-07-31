@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import Slider from '../layout/Slider';
 import {backendApi} from '../services/Api';
 import { useAuth } from '../../ContextApi';
 import toast, { Toaster } from 'react-hot-toast';
@@ -59,10 +60,14 @@ const handleAddToCart = (e, product) => {
   };
 
   return (
+    <>
+      <Slider />
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
+   
       <section className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 text-center">
+          
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
             Welcome to Our Store
           </h1>
@@ -74,10 +79,11 @@ const handleAddToCart = (e, product) => {
           </button>
         </div>
       </section>
+  
 
       {/* Featured Products */}
       <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4">
+        <div className="max-w-5sl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">Featured Products</h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
@@ -129,6 +135,7 @@ const handleAddToCart = (e, product) => {
       </section>
       <Toaster />
     </div>
+    </>
   );
 };
 

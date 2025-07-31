@@ -14,6 +14,11 @@ const orderSchema = new mongoose.Schema(
         quantity: Number,
       }
     ],
+    status: {
+      type: String,
+      enum: ["pending", "processing", "shipped", "delivered", "cancelled"],
+      default: "pending",
+    },
     customer: {
       name: {
         type: String,
@@ -22,7 +27,23 @@ const orderSchema = new mongoose.Schema(
       email: {
         type: String,
         required: true,
-      }
+      },
+      address: {
+        type: String,
+        required: true,
+      },
+      phone: {
+        type: String,
+        required: true,
+      },
+      city: {
+        type: String,
+        required: true,
+      },
+      country: {
+        type: String,
+        required: true,
+      },
     },
     totalPrice: {
       type: Number,
