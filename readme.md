@@ -29,14 +29,21 @@ Users can browse products, add them to the cart, and place orders — all withou
 - `POST /api/auth/login` - Login as user
 - `POST /api/auth/register` - Register User
 - `POST /api/orders` – Place a new order
-- `GET /api/orders` – Get all orders (admin)
-- `GET /api/orders/:id` – Get order by ID
-- `GET /api/orders/email/:email` – Get orders by customer email
+- `GET /api/orders/new` – Get all orders (admin)
+- `DELETE /api/orders/` - Delete an Orders by id (admin)
+- `PUT  /api/orders/:id/status` - Change order status (admin)
 - `GET /api/products/` - Get all Products
 - `GET /api/products/:id` - Get Product by Id
 - `POST /api/products/new` - Add New product (admin)
 
-
+## Demo users
+* `Admin User`
+- email: admin@admin.com
+- pass: 12345
+- '---------------'
+* `Demo user`
+- email: user@user.com
+- pass: 12345
 ---
 
 ## 🛠 Getting Started

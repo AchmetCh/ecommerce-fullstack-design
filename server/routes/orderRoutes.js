@@ -5,10 +5,6 @@ const auth = require('../middlewares/authMiddleware');
 
 // Get all orders (protected route)
 router.get('/', auth.authenticate, auth.isAdmin, order.getAllOrders); 
-// Get an order by ID (protected route)
-router.get('/:id', auth.authenticate, order.getOrderById);
-// Get orders by customer email (protected route)
-router.get('/email/:email', auth.authenticate, order.getOrderByEmail);
 // Place a new order (protected route)
 router.post('/new', order.addOrder);
 // Delete an order by ID (protected route)
