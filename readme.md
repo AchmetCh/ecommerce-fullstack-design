@@ -28,13 +28,14 @@ Users can browse products, add them to the cart, and place orders — all withou
 ## 📦 Available API Endpoints
 - `POST /api/auth/login` - Login as user
 - `POST /api/auth/register` - Register User
+- `GET /api/products/` - Get all Products
+- `GET /api/products/:id` - Get Product by Id
+- `POST /api/products/new` - Add New product (admin)
 - `POST /api/orders` – Place a new order
 - `GET /api/orders/new` – Get all orders (admin)
 - `DELETE /api/orders/` - Delete an Orders by id (admin)
 - `PUT  /api/orders/:id/status` - Change order status (admin)
-- `GET /api/products/` - Get all Products
-- `GET /api/products/:id` - Get Product by Id
-- `POST /api/products/new` - Add New product (admin)
+
 
 ## Demo users
 * `Admin User`
