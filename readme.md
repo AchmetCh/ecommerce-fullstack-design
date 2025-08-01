@@ -75,6 +75,14 @@ PORT = 8000
 npm start
 ```
 
+
+## 📄 License
+
+This project is licensed under the [MIT License](https://opensource.org/license/mit).
+
+You are free to use, modify, and distribute this project for personal or commercial purposes, but please give credit by keeping the license notice.
+
+
 **📫 Contact**
 * Made with ❤️ by Achmet
 Feel free to reach out: achmet@dr.com
