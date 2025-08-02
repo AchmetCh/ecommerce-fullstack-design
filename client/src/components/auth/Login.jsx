@@ -1,80 +1,81 @@
 import React, { useState, useEffect } from 'react'
-import { useAuth } from '../../ContextApi';
-import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { backendApi } from '../services/Api';
-import toast, { Toaster } from 'react-hot-toast';
+import { Link } from 'react-router-dom'
 
 const Login = () => {
-  const { login, user } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const navigate = useNavigate();
-  useEffect(() => {
-    if (user) {
-      navigate('/'); // Redirect to home if user is already logged in
-    }
-  }, [user, navigate]);
+  // Simulated functions for demo - replace with your actual imports
   const handleLogin = async (e) => {
     e.preventDefault();
-    try {
-      const response = await axios.post(`${backendApi}/auth/login`, { email, password });
-      login(response.data.token);
-      navigate('/'); // Redirect to home after successful login
-    } catch (error) {
-      console.error('Login failed:', error);
-      toast.error('Login failed. Please check your credentials and try again.', {
-        position: 'top-right',
-        duration: 3000,
-      });
-    }
+    console.log('Login attempt with:', { email, password });
+    // Your actual login logic here
   };
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-4">Login Page</h1>
-      <form onSubmit={handleLogin}>
-        <div className="mb-4">
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-            Email
-          </label>
-          <input
-            type="email"
-            id="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="mt-1 p-2 border border-gray-300 rounded-md w-full"
-            required
-          />
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        <div className="bg-white rounded-lg shadow-md p-8">
+          {/* Header */}
+          <div className="text-center mb-6">
+            <h1 className="text-2xl font-bold text-gray-800 mb-2">Login</h1>
+            <p className="text-gray-600">Sign in to your account</p>
+          </div>
+
+          {/* Form */}
+          <div className="space-y-4">
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                Email
+              </label>
+              <input
+                type="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Enter your email"
+                required
+              />
+            </div>
+
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                Password
+              </label>
+              <input
+                type="password"
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Enter your password"
+                required
+              />
+            </div>
+
+            <button
+              type="submit"
+              onClick={handleLogin}
+              className="w-full bg-blue-600 text-white font-medium py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+            >
+              Login
+            </button>
+          </div>
+
+          {/* Register Link */}
+          <div className="text-center mt-6">
+            <p className="text-gray-600">
+              Don't have an account?{' '}
+              <Link to="/register" className="text-blue-600 hover:text-blue-700 font-medium hover:underline">
+              <button className="text-blue-600 hover:text-blue-700 font-medium hover:underline">
+                Register
+              </button>
+              </Link>
+            </p>
+          </div>
         </div>
-        <div className="mb-4">
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-            Password
-          </label>
-          <input
-            type="password"
-            id="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="mt-1 p-2 border border-gray-300 rounded-md w-full"
-            required
-          />
-        </div>
-        <button
-          type="submit"
-          className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition font-medium"
-        >
-          Login
-        </button>
-      </form>
-      <p className="mt-4">
-        Don't have an account?{' '}
-        <Link to="/register" className="text-blue-500 hover:underline">
-          Register
-        </Link>
-      </p>
-      <Toaster />
+      </div>
     </div>
   )
 }
