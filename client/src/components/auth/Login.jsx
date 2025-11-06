@@ -1,15 +1,34 @@
 import React, { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import axios from 'axios'
+import  backendApi  from '../services/Api'
+import { useAuth } from '../../ContextApi'
+import toast, { Toaster } from 'react-hot-toast';
+
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
   // Simulated functions for demo - replace with your actual imports
   const handleLogin = async (e) => {
     e.preventDefault();
     console.log('Login attempt with:', { email, password });
+    if (!email || !password) {
+      toast.error('Please enter both email and password');
+      return;
+    }
     // Your actual login logic here
+    try {
+      const response = await axios.post(`${backendApi}/auth/login`, { email, password });
+      login(response.data.token);
+      toast.success('Login successful!');
+    } catch (error) {
+      console.error('Login failed:', error);
+      toast.error('Login failed. Please check your credentials.');
+    }
   };
 
   return (
@@ -76,6 +95,7 @@ const Login = () => {
           </div>
         </div>
       </div>
+      <Toaster />
     </div>
   )
 }

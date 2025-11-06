@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import { backendApi } from '../services/Api';
+import  backendApi  from '../services/Api'
 import { useAuth } from '../../ContextApi';
 
 const Cart = () => {

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import Slider from '../layout/Slider';
-import {backendApi} from '../services/Api';
+import  backendApi  from '../services/Api'
 import { useAuth } from '../../ContextApi';
 import toast, { Toaster } from 'react-hot-toast';
 

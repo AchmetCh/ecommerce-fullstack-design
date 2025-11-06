@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { backendApi } from "../services/Api";
+import  backendApi  from '../services/Api'
 import { Link, useNavigate, useLocation } from "react-router-dom";
 
 const Slider = () => {
@@ -182,7 +182,7 @@ const Slider = () => {
                 >
                   {slides.map((slide, index) => (
                     <div
-                      key={slide.id}
+                      key={index}
                       className={`w-full h-full relative flex items-center justify-between px-4 sm:px-6 md:px-8 bg-gradient-to-r from-blue-600 to-purple-600 flex-shrink-0`}
                       style={{
                         backgroundImage: slide.image
